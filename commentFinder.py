@@ -1,6 +1,6 @@
 import praw
 import pymongo
-from datetime import datetime
+from datetime import datetime, timedelta
 from config_dict import config
 
 def setup():
@@ -23,33 +23,35 @@ def getAllThreads(reddit, mongoClient):
 					if found.permalink not in link_to_last_update
 				]
 
-	mongoClient.threads.insert_many([
-		{
-			"link": found.permalink,
-			"last_crawled": datetime.now()
-		}
-		for found in first_time
-	])
+	if len(first_time) > 0:
+		mongoClient.threads.insert_many([
+			{
+				"link": found.permalink,
+				"last_crawled": datetime.now()
+			}
+			for found in first_time
+		])
 
 	now = datetime.now()
+
 	needs_update = [
 						found for found in found_threads 
 						if found.permalink in link_to_last_update 
-						and link_to_last_update[found.permalink] < (now - datetime.timedelta(hours=1))
+						and link_to_last_update[found.permalink] < (now - timedelta(hours=1))
 					]
-
-	mongoClient.threads.update_many(
-		{
-			"link": {
-				"$in": [to_update['link'] for to_update in needs_update]
+	if len(needs_update) > 0:
+		mongoClient.threads.update_many(
+			{
+				"link": {
+					"$in": [to_update.permalink for to_update in needs_update]
+				}
+			},
+			{
+				"$set": {
+					"last_crawled": now
+				}
 			}
-		},
-		{
-			"$set": {
-				"last_crawled": now
-			}
-		}
-	)
+		)
 
 	return first_time + needs_update
 
