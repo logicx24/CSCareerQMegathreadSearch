@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 #import logging 
 
 import periodicUpdate
@@ -11,7 +11,7 @@ ix = searchingInfra.genIndex()
 
 @app.route("/")
 def test():
-	return "testing response"
+	return render_template("index.html")
 
 @app.route("/search", methods=["POST"])
 def searchRoute():

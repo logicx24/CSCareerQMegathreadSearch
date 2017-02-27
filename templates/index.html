@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Bare - Start Bootstrap Template</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+        /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+    }
+    </style>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Start Bootstrap</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#">About</a>
+                    </li>
+                    <li>
+                        <a href="#">Services</a>
+                    </li>
+                    <li>
+                        <a href="#">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+    <div class="row" style="text-align:center;">
+        <div class="col-md-6" style="width: 100%;">
+            <h2>Search Big 4 Megathreads</h2>
+            <div id="custom-search-input">
+                <div class="input-group col-md-12" >
+                    <input id="search-box-input" type="text" class="form-control input-lg" placeholder="Search"/>
+                    <span class="input-group-btn">
+                        <button id="search-submit" class="btn btn-info btn-lg" type="button">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- /.row -->
+
+    <ul id="results-list" class="list-group">
+      <li class="list-group-item">Vestibulum at eros</li>
+    </ul>
+
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="static/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="static/js/bootstrap.min.js"></script>
+
+    <script type=text/javascript>
+
+        var successFunc = function (returned_data) {
+            
+            returned_data.slice(0,-1).forEach(function (result) {
+                new_li = $("<li>", {class: "list-group-item"});
+
+                new_li.append("<a href=https://reddit.com" + result['link'] + ">" + "Comment Permalink</a>");
+                new_li.append($("<p>").html(result["highlights"]));
+                new_li.append($("<p>").html(result["matching_terms"].join(", ")));
+                $("#results-list").append(new_li);
+
+            });
+        }
+
+        $("#search-submit").click(function () {
+            $("#results-list").empty();
+            $.ajax({
+                url: "/search",
+                type: "post",
+                dataType: "json",
+                success: successFunc,
+                data: {"query": $('#search-box-input').val()}
+            });
+        });
+
+        $("#search-box-input").keyup(function(event){
+            if(event.keyCode == 13){
+                $("#search-submit").click();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
