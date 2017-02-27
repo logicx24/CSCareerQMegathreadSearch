@@ -6,7 +6,7 @@ import logging
 import commentFinder
 import searchingInfra
 
-logging.basicConfig(filename='app.log',level=logging.DEBUG)
+#logging.basicConfig(filename='app.log',level=logging.DEBUG)
 
 def handleErrors(job_func):
 	def wrapper(*args, **kwargs):
