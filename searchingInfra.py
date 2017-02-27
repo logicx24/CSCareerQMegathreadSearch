@@ -67,7 +67,7 @@ def search(ix, text):
 if __name__ == "__main__":
 	ix = genIndex()
 	buildIndex(ix)
-	print(search(ix, "hitler"))
+	print(search(ix, "google promotion"))
 
 
 
