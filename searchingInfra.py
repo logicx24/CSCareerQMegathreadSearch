@@ -38,14 +38,17 @@ def buildIndex(ix):
 		)
 	writer.commit()
 	mongoCli.comments.update_many({"indexed": False}, {"$set": {"indexed": True}})
+	mongoCli.close()
 
 def updateIndex():
 	return buildIndex(genIndex())
 
 def clearIndex(ix):
+	mongoCli = mongoConn()
 	writer = ix.writer()
 	writer.commit(mergetype=writing.CLEAR)
 	mongoCli.comments.update_many({"indexed": True}, {"$set": {"indexed": False}})
+	mongoCli.close()
 
 def search(ix, text):
 	with ix.searcher() as searcher:

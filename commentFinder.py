@@ -44,6 +44,7 @@ def main():
 		getAllComments(threads, mongoCli)
 	else:
 		print("No new threads")
+	mongoCli.close()
 
 if __name__ == "__main__":
 	main()
