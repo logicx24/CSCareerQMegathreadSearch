@@ -44,19 +44,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Start Bootstrap</a>
+                <a class="navbar-brand" href="http://aakashjapi.com/">About the Author</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a href="#">About</a>
-                    </li>
-                    <li>
-                        <a href="#">Services</a>
-                    </li>
-                    <li>
-                        <a href="#">Contact</a>
+                        <a href="https://github.com/logicx24/CSCareerQMegathreadSearch">Source Code</a>
                     </li>
                 </ul>
             </div>
@@ -86,7 +80,6 @@
         <!-- /.row -->
 
     <ul id="results-list" class="list-group">
-      <li class="list-group-item">Vestibulum at eros</li>
     </ul>
 
     </div>
@@ -101,13 +94,18 @@
     <script type=text/javascript>
 
         var successFunc = function (returned_data) {
-            
-            returned_data.slice(0,-1).forEach(function (result) {
-                new_li = $("<li>", {class: "list-group-item"});
+            if (returned_data["hits"].length == 0) {
+                $("#results-list").append($("<li>", {class: "list-group-item"}).html("<b> No results were found for this search </b"));
+                return;
+            }
 
-                new_li.append("<a href=https://reddit.com" + result['link'] + ">" + "Comment Permalink</a>");
+            $("#results-list").append($("<li>", {class: "list-group-item"}).html("Popular terms: <b>" + returned_data['matched_terms'].join(", ") + "</b>"));
+
+            returned_data["hits"].forEach(function (result) {
+                new_li = $("<li>", {class: "list-group-item"});
+                new_li.append("<a href=https://reddit.com" + result['link'] + ">" + "Comment Link</a>");
                 new_li.append($("<p>").html(result["highlights"]));
-                new_li.append($("<p>").html(result["matching_terms"].join(", ")));
+                new_li.append($("<p>").html("<b>" + result["matching_terms"].join(", ") + "<b>"));
                 $("#results-list").append(new_li);
 
             });
