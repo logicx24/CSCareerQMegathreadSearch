@@ -15,7 +15,7 @@ def mongoConn():
 
 def genIndex():
 	schema = Schema(body=TEXT(stored=True), 
-					link=ID(stored=True))
+					link=ID(stored=True, unique=True))
 
 	if not os.path.exists("indexdir"):
 	    os.mkdir("indexdir")
@@ -32,7 +32,7 @@ def buildIndex(ix):
 	writer = ix.writer()
 
 	for comment in mongoCli.comments.find({"indexed": False}):
-		writer.add_document(
+		writer.update_document(
 			body=comment['body'],
 			link=comment['link']
 		)
