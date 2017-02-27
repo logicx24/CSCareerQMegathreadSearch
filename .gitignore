@@ -1,0 +1,4 @@
+venv/*
+indexdir/*
+*.pyc
+config_dict.py
