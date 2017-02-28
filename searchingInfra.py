@@ -17,13 +17,13 @@ def genIndex():
 	schema = Schema(body=TEXT(stored=True), 
 					link=ID(stored=True, unique=True))
 
-	if not os.path.exists("indexdir"):
-	    os.mkdir("indexdir")
+	if not os.path.exists("/home/aakash/CSCareerQMegathreadSearch/CSCareerQMegathreadSearch/indexdir"):
+	    os.mkdir("/home/aakash/CSCareerQMegathreadSearch/CSCareerQMegathreadSearch/indexdir")
 
-	if index.exists_in("indexdir"):
-		ix = index.open_dir("indexdir")
+	if index.exists_in("/home/aakash/CSCareerQMegathreadSearch/CSCareerQMegathreadSearch/indexdir"):
+		ix = index.open_dir("/home/aakash/CSCareerQMegathreadSearch/CSCareerQMegathreadSearch/indexdir")
 	else:
-		ix = index.create_in("indexdir", schema)
+		ix = index.create_in("/home/aakash/CSCareerQMegathreadSearch/CSCareerQMegathreadSearch/indexdir", schema)
 
 	return ix
 
