@@ -19,6 +19,6 @@ def searchRoute():
 	return jsonify(search_results)
 
 if __name__ == "__main__":
-	#periodicUpdate.backgroundThread()
+	periodicUpdate.backgroundThread()
 	app.run()
 	
