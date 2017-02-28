@@ -22,17 +22,17 @@ def getAllThreads(reddit, mongoClient):
 					found for found in found_threads 
 					if found.permalink not in link_to_last_update
 				]
-
+	now = datetime.now()
 	if len(first_time) > 0:
 		mongoClient.threads.insert_many([
 			{
 				"link": found.permalink,
-				"last_crawled": datetime.now()
+				"last_crawled": now
 			}
 			for found in first_time
 		])
 
-	now = datetime.now()
+	
 
 	needs_update = [
 						found for found in found_threads 
@@ -67,7 +67,9 @@ def getAllComments(threads, mongoClient):
 					"body": comment.body,
 					"link": comment.permalink(),
 					"indexed": False,
-					"thread_link": thread.permalink
+					"thread_link": thread.permalink,
+					"karma": comment.score,
+					"time_posted": datetime.fromtimestamp(comment.created)
 				})
 		mongoClient.comments.insert_many(comments_for_thread)
 

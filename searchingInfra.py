@@ -3,19 +3,25 @@ from config_dict import config
 
 from whoosh import index
 from whoosh import sorting
-from whoosh.fields import Schema, ID, KEYWORD, TEXT
-from whoosh.qparser import QueryParser
 from whoosh import writing
+
+from whoosh.fields import Schema, ID, KEYWORD, TEXT, NUMERIC, DATETIME
+from whoosh import highlight
+from whoosh.qparser import QueryParser
 
 import os, os.path
 import pymongo
+import time
+
 
 def mongoConn():
 	return pymongo.MongoClient()[config["mongo_collection"]]
 
 def genIndex():
 	schema = Schema(body=TEXT(stored=True), 
-					link=ID(stored=True, unique=True))
+					link=ID(stored=True, unique=True),
+					karma=NUMERIC(int, 64, stored=True),
+					posted_date=DATETIME(stored=True))
 
 	if not os.path.exists("indexdir"):
 	    os.mkdir("indexdir")
@@ -34,7 +40,9 @@ def buildIndex(ix):
 	for comment in mongoCli.comments.find({"indexed": False}):
 		writer.update_document(
 			body=comment['body'],
-			link=comment['link']
+			link=comment['link'],
+			karma=comment['karma'],
+			posted_date=comment['time_posted']
 		)
 	writer.commit()
 	mongoCli.comments.update_many({"indexed": False}, {"$set": {"indexed": True}})
@@ -54,6 +62,7 @@ def search(ix, text):
 		q = qp.parse(text)
 
 		search_hits = searcher.search(q, limit=None, terms=True)
+		search_hits.fragmenter = highlight.SentenceFragmenter(maxchars=450)
 
 		res = []
 		for hit in search_hits:
@@ -67,7 +76,7 @@ def search(ix, text):
 if __name__ == "__main__":
 	ix = genIndex()
 	buildIndex(ix)
-	print(search(ix, "google promotion"))
+	print(search(ix, "jeff bezos"))
 
 
 
