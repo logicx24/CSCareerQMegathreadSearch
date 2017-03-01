@@ -28,10 +28,6 @@ def getSearchUpdateThreads(reddit, mongoClient):
 							or tmp['last_updated'] <= (now - timedelta(hours=1))
 						]
 
-	found_threads = []
-	for tagged_search in searches_to_update:
-		found_threads += list(reddit.subreddit(tagged_search['subreddit']).search(tagged_search['search_text'], sort="new"))
-
 	mongoClient.searches.update_many(
 		{
 			"_id": {
@@ -45,27 +41,37 @@ def getSearchUpdateThreads(reddit, mongoClient):
 			}
 		}
 	)
-	# Change found_threads -> should take in a list of threads (>= 1 thread).
+
+	found_threads = []
+	for tagged_search in searches_to_update:
+		found_threads += [
+							(thread, tagged_search) for thread in
+							reddit.subreddit(tagged_search['subreddit']).search(tagged_search['search_text'], sort="new")
+						]
+
 	crawled_threads = [crawled for crawled in mongoClient.threads.find({})]
 
 	link_to_last_update = {crawled['link']: crawled['last_crawled'] for crawled in crawled_threads}
 
 	first_time = [
 					found for found in found_threads 
-					if found.permalink not in link_to_last_update
+					if found[0].permalink not in link_to_last_update
 				]
 	
 	if len(first_time) > 0:
-		mongoClient.threads.insert_many([
+		inserted_ids = mongoClient.threads.insert_many([
 			{
-				"link": found.permalink,
+				"link": found[0].permalink,
 				"last_crawled": now,
-				"new": False
+				"new": False,
+				"parent_search_id": found[1]["_id"]
 			}
 			for found in first_time
 		])
 
-	return first_time #+ needs_update
+		return first_time #+ needs_update
+	else:
+		return []
 
 def getThreadsUpdate(reddit, mongoClient):
 	crawled_threads = [crawled for crawled in mongoClient.threads.find({})]
@@ -89,10 +95,10 @@ def getThreadsUpdate(reddit, mongoClient):
 				}
 			}
 		)
-	return [reddit.submission(url="https://reddit.com" + thread['link']) for thread in needs_update]
+	return [(reddit.submission(url="https://reddit.com" + thread['link']), thread) for thread in needs_update]
 
 def getAllComments(threads, mongoClient):
-	for thread in threads:
+	for thread, db_thread in threads:
 		comments_for_thread = []
 		thread.comments.replace_more(limit=0)
 		mongoClient.comments.delete_many({
@@ -105,7 +111,8 @@ def getAllComments(threads, mongoClient):
 					"indexed": False,
 					"thread_link": thread.permalink,
 					"karma": comment.score,
-					"time_posted": datetime.fromtimestamp(comment.created)
+					"time_posted": datetime.fromtimestamp(comment.created),
+					"parent_thread_id": db_thread["_id"]
 				})
 		mongoClient.comments.insert_many(comments_for_thread)
 
