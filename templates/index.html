@@ -103,7 +103,7 @@
 
             returned_data["hits"].forEach(function (result) {
                 new_li = $("<li>", {class: "list-group-item"});
-                new_li.append("<a href=https://reddit.com" + result['link'] + ">" + "Comment Link</a>");
+                new_li.append("<a href=https://reddit.com" + result['link'] + "?context=10000>" + "Comment Link</a>");
                 new_li.append($("<p>").html(result["highlights"]));
                 new_li.append($("<p>").html("<b>" + result["matching_terms"].join(", ") + "<b>"));
                 new_li.append($("<p>").html("<b> Result Karma: </b>" + result["karma"]));

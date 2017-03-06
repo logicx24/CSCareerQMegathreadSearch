@@ -3,6 +3,8 @@ import pymongo
 from datetime import datetime, timedelta
 from config_dict import config
 
+from urlparse import urlparse
+
 def setup():
 	return praw.Reddit(client_id=config['client_id'],
 					   client_secret=config['client_secret'],
@@ -61,13 +63,14 @@ def getSearchUpdateThreads(reddit, mongoClient):
 	if len(first_time) > 0:
 		inserted_ids = mongoClient.threads.insert_many([
 			{
-				"link": found[0].permalink,
+				"link": urlparse(found[0].permalink).path,
 				"last_crawled": now,
 				"new": False,
 				"parent_search_id": found[1]["_id"]
 			}
 			for found in first_time
 		])
+		mongoClient.threads.find_many({})
 
 		return first_time #+ needs_update
 	else:
@@ -107,9 +110,9 @@ def getAllComments(threads, mongoClient):
 		for comment in thread.comments.list():
 			comments_for_thread.append({
 					"body": comment.body,
-					"link": comment.permalink(),
+					"link": urlparse(comment.permalink()).path,
 					"indexed": False,
-					"thread_link": thread.permalink,
+					"thread_link": db_thread['link'],
 					"karma": comment.score,
 					"time_posted": datetime.fromtimestamp(comment.created),
 					"parent_thread_id": db_thread["_id"]
